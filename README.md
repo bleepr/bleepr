@@ -1,2 +1,2 @@
-# pagr
-Software stack running on Pagr
+# Bleepr
+Software stack running on Bleepr
