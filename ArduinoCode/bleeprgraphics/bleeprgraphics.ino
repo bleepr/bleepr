@@ -134,7 +134,17 @@ unsigned long testText() {
 //  tft.println();
 //  tft.setTextColor(ILI9341_GREEN);
 //  tft.setTextSize(5);
-  tft.println("bleepr");
+  tft.print("b");
+  delay(100);
+  tft.print("l");
+  delay(100);
+  tft.print("e");
+  delay(100);
+  tft.print("e");
+  delay(100);
+  tft.print("p");
+  delay(100);
+  tft.println("r");
   
   delay(1500);
   
