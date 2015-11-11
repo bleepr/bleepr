@@ -14,22 +14,26 @@
 #include <RFID.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
+#include <SoftwareSerial.h>
 
 #define SS_PIN 10
 #define RST_PIN 9
 #define TFT_DC 5
-#define TFT_CS 7
+#define TFT_CS 15
 #define TFT_MOSI 4
 #define TFT_CLK 3
 #define TFT_RST 6
-#define TFT_MISO 2
+#define TFT_MISO 15
+#define BT_TX 7       //Arduino D7 -> BT TX
+#define BT_RX 8       //Arduino D8 -> BT RX
+#define led 13
+#define ext_led 14
 
 RFID rfid(SS_PIN,RST_PIN);
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
+SoftwareSerial bluetooth(BT_TX, BT_RX);
 
 
-int led = 7;
-int power = 8; 
 int serNum[5];
 int cards[][5] = {
   {131,222,128,0,221},
@@ -49,26 +53,51 @@ bool access = false;
 bool theo_access = false;
 bool scott_access = false;
 
+// Buffer for reading in bluetooth text
+String bt_buffer;
+
 void setup(){
 
-    Serial.begin(9600);
-    SPI.begin();
-    rfid.init();
-    tft.begin();
+    Serial.begin(9600);               // starts serial monitor at 9600bps
+    SPI.begin();                      // starts SPI
+    rfid.init();                      // initialises RFID library
+    bluetooth.begin(115200);          // starts bluetooth at 115200
+    delay(100);                       // wait for bluetooth module to sed back command
+    bluetooth.println("U,9600,N");    // temporarily change the bps to 9600, no parity
+    bluetooth.begin(9600);            // starts bluetooth at 9600bps
+    tft.begin();                      // starts TFT screen
+    tft.fillScreen(ILI9341_BLACK);    // fills screen with black
+    tft.setRotation(3);               // sets screen orientation to landscape with pins on left
+    tft.setCursor(0, 75);
+    tft.setTextColor(ILI9341_WHITE);
+    tft.setTextSize(4);
 
+    pinMode(ext_led, OUTPUT);
+    digitalWrite(ext_led, LOW);
 
-    pinMode(led, OUTPUT);
-
-    digitalWrite(led, LOW);
-   
 }
 
 void loop(){
+
+    // Read bluetooth text and print it to screen
     
+    if(bluetooth.available())  // If the bluetooth sent any characters
+    {
+      char char_in = (char)bluetooth.read();
+      if(char_in != '~'){ // Before end char
+        bt_buffer = bt_buffer + char_in;
+      } else { // Print to screen at end char
+        tft.setCursor(5,75);
+        tft.fillScreen(ILI9341_BLACK);
+        tft.println(bt_buffer);
+        bt_buffer = "";
+      }
+      
+    }
+
+    // RFID reading
     if(rfid.isCard()){
-    
         if(rfid.readCardSerial()){
-            tft.setRotation(3);
             tft.fillScreen(ILI9341_BLACK);
             tft.setCursor(0, 75);
             tft.setTextColor(ILI9341_WHITE);
@@ -83,16 +112,16 @@ void loop(){
             Serial.print(" ");
             Serial.print(rfid.serNum[4]);
             Serial.println("");
-//            tft.print(rfid.serNum[0]);
-//            tft.print(" ");
-//            tft.print(rfid.serNum[1]);
-//            tft.print(" ");
-//            tft.print(rfid.serNum[2]);
-//            tft.print(" ");
-//            tft.print(rfid.serNum[3]);
-//            tft.print(" ");
-//            tft.print(rfid.serNum[4]);
-//            tft.println("");
+            tft.print(rfid.serNum[0]);
+            tft.print(" ");
+            tft.print(rfid.serNum[1]);
+            tft.print(" ");
+            tft.print(rfid.serNum[2]);
+            tft.print(" ");
+            tft.print(rfid.serNum[3]);
+            tft.print(" ");
+            tft.print(rfid.serNum[4]);
+            tft.println("");
             
             for(int x = 0; x < sizeof(theo); x++){
               for(int i = 0; i < sizeof(rfid.serNum); i++ ){
@@ -123,32 +152,26 @@ void loop(){
           Serial.println("Welcome Theo!");
           tft.println("Hey Theo!");
           theo_access = false;
-           digitalWrite(led, HIGH); 
+           digitalWrite(ext_led, HIGH); 
            delay(1000);
-           digitalWrite(led, LOW);
-           digitalWrite(power, HIGH);
-           delay(1000);
-           digitalWrite(power, LOW);
-           
+           digitalWrite(ext_led, LOW);           
       } else if(scott_access) {
           Serial.println("Welcome Scott!");
           tft.println("Hey Scott!");
           scott_access = false;
-           digitalWrite(led, HIGH); 
+           digitalWrite(ext_led, HIGH); 
            delay(1000);
-           digitalWrite(led, LOW);
-           digitalWrite(power, HIGH);
-           delay(1000);
-           digitalWrite(power, LOW);
+           digitalWrite(ext_led, LOW);
       } else {
-           Serial.println("Not allowed!"); 
-           digitalWrite(led, HIGH);
+           Serial.println("Not allowed!");
+           tft.println("ACCESS DENIED.");
+           digitalWrite(ext_led, HIGH);
            delay(500);
-           digitalWrite(led, LOW); 
+           digitalWrite(ext_led, LOW); 
            delay(500);
-           digitalWrite(led, HIGH);
+           digitalWrite(ext_led, HIGH);
            delay(500);
-           digitalWrite(led, LOW);         
+           digitalWrite(ext_led, LOW);         
        }        
     }
     

@@ -1,7 +1,7 @@
 
 #include <SoftwareSerial.h>
 
-SoftwareSerial mySerial(10, 11); // RX, TX
+SoftwareSerial mySerial(1, 0); // RX, TX
 
 void setup() {
   // Open serial communications and wait for port to open:
