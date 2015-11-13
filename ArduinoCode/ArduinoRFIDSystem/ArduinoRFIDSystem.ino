@@ -36,23 +36,11 @@ SoftwareSerial bluetooth(BT_TX, BT_RX);
 
 
 int serNum[5];
-int cards[][5] = {
-  {131,222,128,0,221},
-  {131,222,128,0,222},
-  {131,222,128,0,223},
-  {131,222,128,0,224}
-  
-};
-int theo[][5] = {
-  {86,94,109,143,234}
-};
-int scott[][5] = {
-  {156,65,247,175,133}
+int test[][5] = {
+  {131,222,128,0,221}
 };
 
 bool access = false;
-bool theo_access = false;
-bool scott_access = false;
 
 // Buffer for reading in bluetooth text
 String bt_buffer;
@@ -68,11 +56,8 @@ void setup(){
     bluetooth.begin(9600);            // starts bluetooth at 9600bps
     tft.begin();                      // starts TFT screen
     tft.setRotation(3);               // sets screen orientation to landscape with pins on left
-    tft.fillRect(0,0,160,120,ILI9341_LIGHTGREY);
-    tft.fillRect(160,0,160,120,ILI9341_DARKGREY);
-    tft.fillRect(0,120,160,120,ILI9341_DARKGREY);
-    tft.fillRect(160,120,160,120,ILI9341_LIGHTGREY);
-    homeDisplay();
+    tft.setTextSize(2);
+    loginDisplay();
     
 
     pinMode(ext_led, OUTPUT);
@@ -108,9 +93,6 @@ void loop(){
             delay(40);
             noTone(speaker);
             tft.fillScreen(ILI9341_BLACK);
-            tft.setCursor(0, 75);
-            tft.setTextColor(ILI9341_WHITE);
-            tft.setTextSize(4);
             Serial.print(rfid.serNum[0]);
             Serial.print(" ");
             Serial.print(rfid.serNum[1]);
@@ -121,57 +103,39 @@ void loop(){
             Serial.print(" ");
             Serial.print(rfid.serNum[4]);
             Serial.println("");
-            tft.print(rfid.serNum[0]);
-            tft.print(" ");
-            tft.print(rfid.serNum[1]);
-            tft.print(" ");
-            tft.print(rfid.serNum[2]);
-            tft.print(" ");
-            tft.print(rfid.serNum[3]);
-            tft.print(" ");
-            tft.print(rfid.serNum[4]);
-            tft.println("");
+//            tft.print(rfid.serNum[0]);
+//            tft.print(" ");
+//            tft.print(rfid.serNum[1]);
+//            tft.print(" ");
+//            tft.print(rfid.serNum[2]);
+//            tft.print(" ");
+//            tft.print(rfid.serNum[3]);
+//            tft.print(" ");
+//            tft.print(rfid.serNum[4]);
+//            tft.println("");
             
-            for(int x = 0; x < sizeof(theo); x++){
+            for(int x = 0; x < sizeof(test); x++){
               for(int i = 0; i < sizeof(rfid.serNum); i++ ){
-                  if(rfid.serNum[i] != theo[x][i]) {
-                      theo_access = false;
+                  if(rfid.serNum[i] != test[x][i]) {
+                      access = false;
                       break;
                   } else {
-                      theo_access = true;
+                      access = true;
                   }
               }
-              if(theo_access) break;
-            }
-            for(int x = 0; x < sizeof(scott); x++){
-              for(int i = 0; i < sizeof(rfid.serNum); i++ ){
-                  if(rfid.serNum[i] != scott[x][i]) {
-                      scott_access = false;
-                      break;
-                  } else {
-                      scott_access = true;
-                  }
-              }
-              if(scott_access) break;
-            }
-           
+              if(access) break;
+            }           
         }
 
-       if(theo_access){
-          Serial.println("Welcome Theo!");
-          tft.println("Hey Theo!");
-          theo_access = false;
-           digitalWrite(ext_led, HIGH); 
-           delay(1000);
-           digitalWrite(ext_led, LOW);           
-      } else if(scott_access) {
-          Serial.println("Welcome Scott!");
-          tft.println("Hey Scott!");
-          scott_access = false;
-           digitalWrite(ext_led, HIGH); 
-           delay(1000);
-           digitalWrite(ext_led, LOW);
-      } else {
+       if(access){
+          tft.setCursor(0, 75);
+          tft.setTextColor(ILI9341_WHITE);
+          tft.setTextSize(4);
+          Serial.println("Welcome TEST!");
+          tft.println("Hey TEST!");
+          access = false;
+          homeDisplay();
+        } else {
            Serial.println("Not allowed!");
            tft.println("ACCESS DENIED.");
            tone(speaker, 400);
@@ -186,6 +150,7 @@ void loop(){
            delay(150);
            noTone(speaker);
            delay(100);
+           loginDisplay();
        }        
     }
     
@@ -195,7 +160,18 @@ void loop(){
 
 }
 
+void loginDisplay(){
+  tft.fillScreen(ILI9341_BLACK);
+  tft.setTextSize(2);
+  tft.setCursor(5,20);
+  tft.println("Login by placing your card on the screen.");
+}
+
 void homeDisplay(){
+  tft.fillRect(0,0,160,120,ILI9341_LIGHTGREY);
+  tft.fillRect(160,0,160,120,ILI9341_DARKGREY);
+  tft.fillRect(0,120,160,120,ILI9341_DARKGREY);
+  tft.fillRect(160,120,160,120,ILI9341_LIGHTGREY);
   tft.setTextSize(2);
   tft.setCursor(5,60);
   tft.println("Call waiter");
