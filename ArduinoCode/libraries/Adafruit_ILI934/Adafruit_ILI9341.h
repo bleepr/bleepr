@@ -99,6 +99,7 @@
 #define ILI9341_PURPLE      0x780F      /* 128,   0, 128 */
 #define ILI9341_OLIVE       0x7BE0      /* 128, 128,   0 */
 #define ILI9341_LIGHTGREY   0xC618      /* 192, 192, 192 */
+#define ILI9341_MIDGREY     0xA0A0A0
 #define ILI9341_DARKGREY    0x7BEF      /* 128, 128, 128 */
 #define ILI9341_BLUE        0x001F      /*   0,   0, 255 */
 #define ILI9341_GREEN       0x07E0      /*   0, 255,   0 */

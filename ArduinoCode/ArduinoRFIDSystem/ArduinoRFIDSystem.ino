@@ -28,6 +28,7 @@
 #define BT_RX 8       //Arduino D8 -> BT RX
 #define led 13
 #define ext_led 14
+#define speaker 2
 
 RFID rfid(SS_PIN,RST_PIN);
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
@@ -66,14 +67,17 @@ void setup(){
     bluetooth.println("U,9600,N");    // temporarily change the bps to 9600, no parity
     bluetooth.begin(9600);            // starts bluetooth at 9600bps
     tft.begin();                      // starts TFT screen
-    tft.fillScreen(ILI9341_BLACK);    // fills screen with black
     tft.setRotation(3);               // sets screen orientation to landscape with pins on left
-    tft.setCursor(0, 75);
-    tft.setTextColor(ILI9341_WHITE);
-    tft.setTextSize(4);
+    tft.fillRect(0,0,160,120,ILI9341_LIGHTGREY);
+    tft.fillRect(160,0,160,120,ILI9341_DARKGREY);
+    tft.fillRect(0,120,160,120,ILI9341_DARKGREY);
+    tft.fillRect(160,120,160,120,ILI9341_LIGHTGREY);
+    homeDisplay();
+    
 
     pinMode(ext_led, OUTPUT);
     digitalWrite(ext_led, LOW);
+    pinMode(speaker, OUTPUT);
 
 }
 
@@ -98,6 +102,11 @@ void loop(){
     // RFID reading
     if(rfid.isCard()){
         if(rfid.readCardSerial()){
+            tone(speaker, 800);
+            delay(120);
+            tone(speaker, 1000);
+            delay(40);
+            noTone(speaker);
             tft.fillScreen(ILI9341_BLACK);
             tft.setCursor(0, 75);
             tft.setTextColor(ILI9341_WHITE);
@@ -165,13 +174,18 @@ void loop(){
       } else {
            Serial.println("Not allowed!");
            tft.println("ACCESS DENIED.");
-           digitalWrite(ext_led, HIGH);
-           delay(500);
-           digitalWrite(ext_led, LOW); 
-           delay(500);
-           digitalWrite(ext_led, HIGH);
-           delay(500);
-           digitalWrite(ext_led, LOW);         
+           tone(speaker, 400);
+           delay(150);
+           noTone(speaker);
+           delay(100);
+           tone(speaker, 400);
+           delay(150);
+           noTone(speaker);
+           delay(100);
+           tone(speaker, 400);
+           delay(150);
+           noTone(speaker);
+           delay(100);
        }        
     }
     
@@ -181,4 +195,16 @@ void loop(){
 
 }
 
+void homeDisplay(){
+  tft.setTextSize(2);
+  tft.setCursor(5,60);
+  tft.println("Call waiter");
+  tft.setCursor(165,60);
+  tft.println("Ask for bill");
+  tft.setCursor(5,180);
+  tft.println("Food status");
+  tft.setCursor(165,180);
+  tft.println("Leave table");
+  
+}
 

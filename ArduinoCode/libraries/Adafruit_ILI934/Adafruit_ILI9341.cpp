@@ -89,10 +89,10 @@ void Adafruit_ILI9341::spiwrite(uint8_t c) {
     // Fast SPI bitbang swiped from LPD8806 library
     for(uint8_t bit = 0x80; bit; bit >>= 1) {
       if(c & bit) {
-	//digitalWrite(_mosi, HIGH); 
+	//digitalWrite(_mosi, HIGH);
 	*mosiport |=  mosipinmask;
       } else {
-	//digitalWrite(_mosi, LOW); 
+	//digitalWrite(_mosi, LOW);
 	*mosiport &= ~mosipinmask;
       }
       //digitalWrite(_sclk, HIGH);
@@ -126,12 +126,12 @@ void Adafruit_ILI9341::writedata(uint8_t c) {
   //digitalWrite(_sclk, LOW);
   *csport &= ~cspinmask;
   //digitalWrite(_cs, LOW);
-  
+
   spiwrite(c);
 
   //digitalWrite(_cs, HIGH);
   *csport |= cspinmask;
-} 
+}
 
 
 // Rather than a bazillion writecommand() and writedata() calls, screen
@@ -233,116 +233,116 @@ void Adafruit_ILI9341::begin(void) {
   Serial.print("\nSelf Diagnostic: 0x"); Serial.println(x, HEX);
 */
   //if(cmdList) commandList(cmdList);
-  
+
   if (hwSPI) spi_begin();
   writecommand(0xEF);
   writedata(0x03);
   writedata(0x80);
   writedata(0x02);
 
-  writecommand(0xCF);  
-  writedata(0x00); 
-  writedata(0XC1); 
-  writedata(0X30); 
+  writecommand(0xCF);
+  writedata(0x00);
+  writedata(0XC1);
+  writedata(0X30);
 
-  writecommand(0xED);  
-  writedata(0x64); 
-  writedata(0x03); 
-  writedata(0X12); 
-  writedata(0X81); 
- 
-  writecommand(0xE8);  
-  writedata(0x85); 
-  writedata(0x00); 
-  writedata(0x78); 
+  writecommand(0xED);
+  writedata(0x64);
+  writedata(0x03);
+  writedata(0X12);
+  writedata(0X81);
 
-  writecommand(0xCB);  
-  writedata(0x39); 
-  writedata(0x2C); 
-  writedata(0x00); 
-  writedata(0x34); 
-  writedata(0x02); 
- 
-  writecommand(0xF7);  
-  writedata(0x20); 
+  writecommand(0xE8);
+  writedata(0x85);
+  writedata(0x00);
+  writedata(0x78);
 
-  writecommand(0xEA);  
-  writedata(0x00); 
-  writedata(0x00); 
- 
-  writecommand(ILI9341_PWCTR1);    //Power control 
-  writedata(0x23);   //VRH[5:0] 
- 
-  writecommand(ILI9341_PWCTR2);    //Power control 
-  writedata(0x10);   //SAP[2:0];BT[3:0] 
- 
-  writecommand(ILI9341_VMCTR1);    //VCM control 
+  writecommand(0xCB);
+  writedata(0x39);
+  writedata(0x2C);
+  writedata(0x00);
+  writedata(0x34);
+  writedata(0x02);
+
+  writecommand(0xF7);
+  writedata(0x20);
+
+  writecommand(0xEA);
+  writedata(0x00);
+  writedata(0x00);
+
+  writecommand(ILI9341_PWCTR1);    //Power control
+  writedata(0x23);   //VRH[5:0]
+
+  writecommand(ILI9341_PWCTR2);    //Power control
+  writedata(0x10);   //SAP[2:0];BT[3:0]
+
+  writecommand(ILI9341_VMCTR1);    //VCM control
   writedata(0x3e); //¶Ô±È¶Èµ÷½Ú
-  writedata(0x28); 
-  
-  writecommand(ILI9341_VMCTR2);    //VCM control2 
+  writedata(0x28);
+
+  writecommand(ILI9341_VMCTR2);    //VCM control2
   writedata(0x86);  //--
- 
-  writecommand(ILI9341_MADCTL);    // Memory Access Control 
+
+  writecommand(ILI9341_MADCTL);    // Memory Access Control
   writedata(0x48);
 
-  writecommand(ILI9341_PIXFMT);    
-  writedata(0x55); 
-  
-  writecommand(ILI9341_FRMCTR1);    
-  writedata(0x00);  
-  writedata(0x18); 
- 
-  writecommand(ILI9341_DFUNCTR);    // Display Function Control 
-  writedata(0x08); 
-  writedata(0x82);
-  writedata(0x27);  
- 
-  writecommand(0xF2);    // 3Gamma Function Disable 
-  writedata(0x00); 
- 
-  writecommand(ILI9341_GAMMASET);    //Gamma curve selected 
-  writedata(0x01); 
- 
-  writecommand(ILI9341_GMCTRP1);    //Set Gamma 
-  writedata(0x0F); 
-  writedata(0x31); 
-  writedata(0x2B); 
-  writedata(0x0C); 
-  writedata(0x0E); 
-  writedata(0x08); 
-  writedata(0x4E); 
-  writedata(0xF1); 
-  writedata(0x37); 
-  writedata(0x07); 
-  writedata(0x10); 
-  writedata(0x03); 
-  writedata(0x0E); 
-  writedata(0x09); 
-  writedata(0x00); 
-  
-  writecommand(ILI9341_GMCTRN1);    //Set Gamma 
-  writedata(0x00); 
-  writedata(0x0E); 
-  writedata(0x14); 
-  writedata(0x03); 
-  writedata(0x11); 
-  writedata(0x07); 
-  writedata(0x31); 
-  writedata(0xC1); 
-  writedata(0x48); 
-  writedata(0x08); 
-  writedata(0x0F); 
-  writedata(0x0C); 
-  writedata(0x31); 
-  writedata(0x36); 
-  writedata(0x0F); 
+  writecommand(ILI9341_PIXFMT);
+  writedata(0x55);
 
-  writecommand(ILI9341_SLPOUT);    //Exit Sleep 
+  writecommand(ILI9341_FRMCTR1);
+  writedata(0x00);
+  writedata(0x18);
+
+  writecommand(ILI9341_DFUNCTR);    // Display Function Control
+  writedata(0x08);
+  writedata(0x82);
+  writedata(0x27);
+
+  writecommand(0xF2);    // 3Gamma Function Disable
+  writedata(0x00);
+
+  writecommand(ILI9341_GAMMASET);    //Gamma curve selected
+  writedata(0x01);
+
+  writecommand(ILI9341_GMCTRP1);    //Set Gamma
+  writedata(0x0F);
+  writedata(0x31);
+  writedata(0x2B);
+  writedata(0x0C);
+  writedata(0x0E);
+  writedata(0x08);
+  writedata(0x4E);
+  writedata(0xF1);
+  writedata(0x37);
+  writedata(0x07);
+  writedata(0x10);
+  writedata(0x03);
+  writedata(0x0E);
+  writedata(0x09);
+  writedata(0x00);
+
+  writecommand(ILI9341_GMCTRN1);    //Set Gamma
+  writedata(0x00);
+  writedata(0x0E);
+  writedata(0x14);
+  writedata(0x03);
+  writedata(0x11);
+  writedata(0x07);
+  writedata(0x31);
+  writedata(0xC1);
+  writedata(0x48);
+  writedata(0x08);
+  writedata(0x0F);
+  writedata(0x0C);
+  writedata(0x31);
+  writedata(0x36);
+  writedata(0x0F);
+
+  writecommand(ILI9341_SLPOUT);    //Exit Sleep
   if (hwSPI) spi_end();
-  delay(120); 		
+  delay(120);
   if (hwSPI) spi_begin();
-  writecommand(ILI9341_DISPON);    //Display on 
+  writecommand(ILI9341_DISPON);    //Display on
   if (hwSPI) spi_end();
 
 }
@@ -353,7 +353,7 @@ void Adafruit_ILI9341::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1,
 
   writecommand(ILI9341_CASET); // Column addr set
   writedata(x0 >> 8);
-  writedata(x0 & 0xFF);     // XSTART 
+  writedata(x0 & 0xFF);     // XSTART
   writedata(x1 >> 8);
   writedata(x1 & 0xFF);     // XEND
 
@@ -409,7 +409,7 @@ void Adafruit_ILI9341::drawFastVLine(int16_t x, int16_t y, int16_t h,
   // Rudimentary clipping
   if((x >= _width) || (y >= _height)) return;
 
-  if((y+h-1) >= _height) 
+  if((y+h-1) >= _height)
     h = _height-y;
 
   if (hwSPI) spi_begin();
@@ -576,7 +576,7 @@ uint8_t Adafruit_ILI9341::spiread(void) {
     }
   }
   //Serial.print("read: 0x"); Serial.print(r, HEX);
-  
+
   return r;
 }
 
@@ -585,10 +585,10 @@ uint8_t Adafruit_ILI9341::spiread(void) {
    digitalWrite(_cs, LOW);
    uint8_t r = spiread();
    digitalWrite(_cs, HIGH);
-   
+
    return r;
 }
- 
+
 
 uint8_t Adafruit_ILI9341::readcommand8(uint8_t c, uint8_t index) {
    if (hwSPI) spi_begin();
@@ -603,7 +603,7 @@ uint8_t Adafruit_ILI9341::readcommand8(uint8_t c, uint8_t index) {
    digitalWrite(_sclk, LOW);
    digitalWrite(_cs, LOW);
    spiwrite(c);
- 
+
    digitalWrite(_dc, HIGH);
    uint8_t r = spiread();
    digitalWrite(_cs, HIGH);
@@ -612,14 +612,14 @@ uint8_t Adafruit_ILI9341::readcommand8(uint8_t c, uint8_t index) {
 }
 
 
- 
+
 /*
 
  uint16_t Adafruit_ILI9341::readcommand16(uint8_t c) {
  digitalWrite(_dc, LOW);
  if (_cs)
  digitalWrite(_cs, LOW);
- 
+
  spiwrite(c);
  pinMode(_sid, INPUT); // input!
  uint16_t r = spiread();
@@ -627,21 +627,21 @@ uint8_t Adafruit_ILI9341::readcommand8(uint8_t c, uint8_t index) {
  r |= spiread();
  if (_cs)
  digitalWrite(_cs, HIGH);
- 
+
  pinMode(_sid, OUTPUT); // back to output
  return r;
  }
- 
+
  uint32_t Adafruit_ILI9341::readcommand32(uint8_t c) {
  digitalWrite(_dc, LOW);
  if (_cs)
  digitalWrite(_cs, LOW);
  spiwrite(c);
  pinMode(_sid, INPUT); // input!
- 
+
  dummyclock();
  dummyclock();
- 
+
  uint32_t r = spiread();
  r <<= 8;
  r |= spiread();
@@ -651,9 +651,9 @@ uint8_t Adafruit_ILI9341::readcommand8(uint8_t c, uint8_t index) {
  r |= spiread();
  if (_cs)
  digitalWrite(_cs, HIGH);
- 
+
  pinMode(_sid, OUTPUT); // back to output
  return r;
  }
- 
+
  */
