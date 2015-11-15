@@ -7,19 +7,46 @@ ArduinoPin	-> 	PeripheralNamePin
 3V			VDD33
 GND			GND
 
-A13			RFID2(SCK)
-A12			RFID4(MISO)
-A11			RFID3(MOSI)
-A10			RFID1(SDA)
-A9			RFID7(RST)
+RFID
+-----------------
+D13			RFID2(SCK)
+D12			RFID4(MISO)
+D11			RFID3(MOSI)
+D10			RFID1(SDA)
+D9			RFID7(RST)
 
-A7			SCREEN3(CS)(Through PD)
+SCREEN
+-------------------------------
+GND			SCREEN3(CS)(Through PD)
 A6			SCREEN4(RESET)(Through PD)
 A5			SCREEN5(DC/RS)(Through PD)
 A4			SCREEN6(MOSI)(Through PD)
 A3			SCREEN7(SCK)(Through PD)
 
-Screen is labelled according to board. 
+BLUETOOTH
+-----------
+D8      RX
+D7      TX
+
+SPEAKER
+--------------
+D2      +
+GND     -
+
+BUTTONS (from top left, clockwise)
+----------------
+A0      BTN0 (through resistor to GND)
+A1      BTN1 (through resistor to GND)
+A2      BTN2 (through resistor to GND)
+A3      BTN3 (through resistor to GND)
+
+LED STRIP
+----------------
+A4      DO
+A5      DI
+
+
+Screen is labelled according to board.
 Counting up from top to bottom with screen to right of pins 1-9.
 
 ScreenPin	->	Connection
