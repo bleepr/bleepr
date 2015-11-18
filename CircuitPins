@@ -25,8 +25,8 @@ A3			SCREEN7(SCK)(Through PD)
 
 BLUETOOTH
 -----------
-D8      RX
-D7      TX
+D7      RX
+D8      TX
 
 SPEAKER
 --------------
