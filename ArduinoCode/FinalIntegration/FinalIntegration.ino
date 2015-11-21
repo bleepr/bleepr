@@ -28,7 +28,7 @@
 #define BT_TX 8       //Arduino D8 -> BT TX
 #define BT_RX 7       //Arduino D7 -> BT RX
 #define speaker 2
-#define LEDStrip 20
+#define LEDStrip 18
 #define BTN0 A0
 #define BTN1 A1
 #define BTN2 A2
@@ -38,9 +38,21 @@ RFID rfid(SS_PIN,RST_PIN);
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
 SoftwareSerial bluetooth(BT_TX, BT_RX);
 
+//State to be displayed on screen
+int display_state = 0;
+//0-Idle
+//1-Main Menu
+
+//Helps with the animations
+int screen_drawn = 0;
+unsigned long animation_time = millis();
+
 //LEDs setup
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(30, LEDStrip, NEO_GRB + NEO_KHZ800);
 
+
+//RFID variables
+boolean scanned_card = false;
 
 int serNum[5];
 int test[][5] = {
@@ -51,6 +63,10 @@ bool access = false;
 
 // Buffer for reading in bluetooth text
 String bt_buffer;
+String last_bt = "";
+boolean available_bt = false;
+
+
 
 void setup(){
 
@@ -82,6 +98,37 @@ void setup(){
 
 void loop(){
 
+    //Display switch
+    switch(display_state) {
+      case 0:
+      
+      loginDisplay();
+      
+      
+        if(scanned_card) {
+          if(available_bt) {
+            
+            //screen_drawn = 2; //Icky, will keep printing please wait until card is recieved from server
+            //We can fix this later
+            
+            scanned_card = false;
+            if (read_bt() == "access1") { //Card is good
+              display_state = 1;
+              screen_drawn = 0;
+              homeDisplay();
+            }
+            else {
+              tft.println("Sorry, no access");
+              delay(1000);
+              screen_drawn = 0;
+            }
+          }
+        }
+        break;
+      default:
+        break;
+    }
+              
 
     // Read bluetooth text and print it to screen
     
@@ -92,19 +139,18 @@ void loop(){
         
         bt_buffer = bt_buffer + char_in;
       } else { // Print to screen at end char
-        tft.setCursor(5,75);
-        tft.fillScreen(ILI9341_BLACK);
-        tft.println(bt_buffer);
+        last_bt = bt_buffer;
+        available_bt = true;
         bt_buffer = "";
       }
       
     }
+    
 
     // Read buttons and send to bluetooth
 //    if(digitalRead(BTN0)==HIGH){
 //      bluetooth.print("BTN0");
-//    } else if(digitalRead(BTN1)==HIGH) {
-//      bluetooth.print("BTN1");
+//    } else if(digitalRead(BTN1)==HIGH) {//      bluetooth.print("BTN1");
 //    } else if(digitalRead(BTN2)==HIGH) {
 //      bluetooth.print("BTN2");
 //    } else if(digitalRead(BTN3)==HIGH) {
@@ -112,60 +158,54 @@ void loop(){
 //    }
 
     // RFID reading
-    if(rfid.isCard()){
+    if(rfid.isCard() && !scanned_card){
         if(rfid.readCardSerial()){
             String serNumStr = "";
             for(int i=0; i<5; i++){
               serNumStr = serNumStr + String(rfid.serNum[i]) + " ";              
             }
             bluetooth.print(serNumStr);
+            
+            scanned_card = true;
+            
+            screen_drawn = 2;
+            
             tone(speaker, 800);
             delay(120);
             tone(speaker, 1000);
             delay(40);
             noTone(speaker);
-            
-            for(int x = 0; x < sizeof(test); x++){
-              for(int i = 0; i < sizeof(rfid.serNum); i++ ){
-                  if(rfid.serNum[i] != test[x][i]) {
-                      access = false;
-                      break;
-                  } else {
-                      access = true;
-                  }
-              }
-              if(access) break;
-            }           
+                      
         }
 
-       if(access){
-          tft.setCursor(0, 75);
-          tft.setTextColor(ILI9341_WHITE);
-          tft.setTextSize(4);
-          Serial.println("Welcome TEST!");
-          tft.println("Hey TEST!");
-          colorWipe(strip.Color(0, 100, 0), 10);
-          access = false;
-          homeDisplay();
-        } else {
-           Serial.println("Not allowed!");
-           tft.println("ACCESS DENIED.");
-           colorWipe(strip.Color(255, 0, 0), 10);
-           tone(speaker, 400);
-           delay(150);
-           noTone(speaker);
-           delay(100);
-           tone(speaker, 400);
-           delay(150);
-           noTone(speaker);
-           delay(100);
-           tone(speaker, 400);
-           delay(150);
-           noTone(speaker);
-           delay(100);
-           colorWipe(strip.Color(0, 0, 100), 10);
-           loginDisplay();
-       }        
+//       if(access){
+//          tft.setCursor(0, 75);
+//          tft.setTextColor(ILI9341_WHITE);
+//          tft.setTextSize(4);
+//          Serial.println("Welcome TEST!");
+//          tft.println("Hey TEST!");
+//          colorWipe(strip.Color(0, 100, 0), 10);
+//          access = false;
+//          homeDisplay();
+//        } else {
+//           Serial.println("Not allowed!");
+//           tft.println("ACCESS DENIED.");
+//           colorWipe(strip.Color(255, 0, 0), 10);
+//           tone(speaker, 400);
+//           delay(150);
+//           noTone(speaker);
+//           delay(100);
+//           tone(speaker, 400);
+//           delay(150);
+//           noTone(speaker);
+//           delay(100);
+//           tone(speaker, 400);
+//           delay(150);
+//           noTone(speaker);
+//           delay(100);
+//           colorWipe(strip.Color(0, 0, 100), 10);
+//           loginDisplay();
+//       }        
     }
     
     
@@ -175,36 +215,53 @@ void loop(){
 }
 
 void loginDisplay(){
-  tft.fillScreen(ILI9341_BLACK);
-  tft.setTextSize(2);
-  tft.setCursor(126,113); // centred text
-  tft.println("bleepr");
-  unsigned long time = millis();
-  if(millis() - time == 0){
-    tft.drawCircle(160,120,60,ILI9341_RED);    
-  } else if(millis() - time == 200){
-    tft.drawCircle(160,120,60,ILI9341_BLACK);
+ 
+  switch(screen_drawn) {
+    case 0: // Initialise
+      tft.fillScreen(ILI9341_BLACK);
+      tft.setTextSize(2);
+      tft.setCursor(126,113); // centred text
+      tft.println("bleepr");
+      
+      screen_drawn = 1;
+      animation_time = millis();
+      break;
+     case 1: //Animate (Currently janky and NEEDS to be fixed)
+      if(millis() - animation_time >= 20) {
+        tft.drawCircle(160,120,60,ILI9341_RED);  
+      }  
+//      if(millis() - animation_time >= 200){
+//        tft.drawCircle(160,120,60,ILI9341_BLACK);
+//      }
+//      if(millis() - animation_time >= 240){
+//        tft.drawCircle(160,120,80,ILI9341_YELLOW);
+//      }
+//      if(millis() - animation_time >= 440){
+//        tft.drawCircle(160,120,80,ILI9341_BLACK);
+//      }
+//      if(millis() - animation_time >= 460){
+//        tft.drawCircle(160,120,100,ILI9341_GREEN);
+//      }
+//      if(millis() - animation_time >= 660){
+//        tft.drawCircle(160,120,100,ILI9341_GREEN);
+//      }
+//      if(millis() - animation_time >= 700){
+//        tft.drawCircle(160,120,100,ILI9341_BLACK);
+//      }
+//      if(millis() - animation_time >= 740){
+//        animation_time = millis();
+//      }
+       
+       break;
+     case 2: //Please wait
+       tft.setCursor(126,100); // centred text
+       tft.print("Please wait");
+       screen_drawn = 1;
   }
-//  if(millis() - time == 240){
-//    tft.drawCircle(160,120,80,ILI9341_YELLOW);
-//  }
-//  if(millis() - time == 440){
-//    tft.drawCircle(160,120,80,ILI9341_BLACK);
-//  }
-//  if(millis() - time == 460){
-//    tft.drawCircle(160,120,100,ILI9341_GREEN);
-//  }
-//  if(millis() - time == 660){
-//    tft.drawCircle(160,120,100,ILI9341_GREEN);
-//  }
-//  if(millis() - time == 700){
-//    tft.drawCircle(160,120,100,ILI9341_BLACK);
-//  }
-//  if(millis() - time == 740){
-//    time = millis();
-//  }
 }
 
+
+//Needs to be converted for new steup
 void homeDisplay(){
   tft.fillRect(0,0,160,120,ILI9341_LIGHTGREY);
   tft.fillRect(160,0,160,120,ILI9341_DARKGREY);
@@ -220,6 +277,16 @@ void homeDisplay(){
   tft.setCursor(165,180);
   tft.println("Leave table");
   
+}
+
+//BT Functions
+String read_bt() {
+ if(available_bt) {
+   available_bt = false;
+   return last_bt;
+ } else {
+   return "";
+ }
 }
 
 
