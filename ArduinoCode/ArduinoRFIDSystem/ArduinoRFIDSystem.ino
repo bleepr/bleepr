@@ -160,6 +160,7 @@ void loop(){
 
 }
 
+// Basic login screen 
 void loginDisplay(){
   tft.fillScreen(ILI9341_BLACK);
   tft.setTextSize(2);
@@ -167,11 +168,12 @@ void loginDisplay(){
   tft.println("Login by placing your card on the screen.");
 }
 
+// Home screen with four options
 void homeDisplay(){
-  tft.fillRect(0,0,160,120,ILI9341_LIGHTGREY);
+  tft.fillRect(0,0,160,120,ILI9341_BLACK);
   tft.fillRect(160,0,160,120,ILI9341_DARKGREY);
   tft.fillRect(0,120,160,120,ILI9341_DARKGREY);
-  tft.fillRect(160,120,160,120,ILI9341_LIGHTGREY);
+  tft.fillRect(160,120,160,120,ILI9341_BLACK);
   tft.setTextSize(2);
   tft.setCursor(5,60);
   tft.println("Call waiter");
@@ -183,4 +185,19 @@ void homeDisplay(){
   tft.println("Leave table");
   
 }
+
+// button functions
+void button0(){
+  
+}
+void button1(){
+  
+}
+void button2(){
+  
+}
+void button3(){
+  
+}
+
 

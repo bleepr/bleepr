@@ -19,18 +19,20 @@
 
 #define SS_PIN 10
 #define RST_PIN 9
-#define TFT_DC 5
+#define TFT_DC 4
 #define TFT_CS 15
-#define TFT_MOSI 4
-#define TFT_CLK 3
-#define TFT_RST 6
+#define TFT_MOSI 5
+#define TFT_CLK 6
+#define TFT_RST 3
 #define TFT_MISO 15
-#define BT_TX 7       //Arduino D7 -> BT TX
-#define BT_RX 8       //Arduino D8 -> BT RX
-#define led 13
-#define ext_led 14
+#define BT_TX 8       //Arduino D8 -> BT TX
+#define BT_RX 7       //Arduino D7 -> BT RX
 #define speaker 2
 #define LEDStrip A6
+#define BTN0 A0
+#define BTN1 A1
+#define BTN2 A2
+#define BTN3 A3
 
 RFID rfid(SS_PIN,RST_PIN);
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
@@ -71,13 +73,15 @@ void setup(){
     colorWipe(strip.Color(0, 0, 100), 10); //Blue init
     
 
-    pinMode(ext_led, OUTPUT);
-    digitalWrite(ext_led, LOW);
     pinMode(speaker, OUTPUT);
+    tone(speaker,1000);
+    delay(100);
+    noTone(speaker);
 
 }
 
 void loop(){
+
 
     // Read bluetooth text and print it to screen
     
@@ -85,6 +89,7 @@ void loop(){
     {
       char char_in = (char)bluetooth.read();
       if(char_in != '~'){ // Before end char
+        
         bt_buffer = bt_buffer + char_in;
       } else { // Print to screen at end char
         tft.setCursor(5,75);
@@ -95,35 +100,30 @@ void loop(){
       
     }
 
+    // Read buttons and send to bluetooth
+//    if(digitalRead(BTN0)==HIGH){
+//      bluetooth.print("BTN0");
+//    } else if(digitalRead(BTN1)==HIGH) {
+//      bluetooth.print("BTN1");
+//    } else if(digitalRead(BTN2)==HIGH) {
+//      bluetooth.print("BTN2");
+//    } else if(digitalRead(BTN3)==HIGH) {
+//      bluetooth.print("BTN3");
+//    }
+
     // RFID reading
     if(rfid.isCard()){
         if(rfid.readCardSerial()){
+            String serNumStr = "";
+            for(int i=0; i<5; i++){
+              serNumStr = serNumStr + String(rfid.serNum[i]) + " ";              
+            }
+            bluetooth.print(serNumStr);
             tone(speaker, 800);
             delay(120);
             tone(speaker, 1000);
             delay(40);
             noTone(speaker);
-            tft.fillScreen(ILI9341_BLACK);
-            Serial.print(rfid.serNum[0]);
-            Serial.print(" ");
-            Serial.print(rfid.serNum[1]);
-            Serial.print(" ");
-            Serial.print(rfid.serNum[2]);
-            Serial.print(" ");
-            Serial.print(rfid.serNum[3]);
-            Serial.print(" ");
-            Serial.print(rfid.serNum[4]);
-            Serial.println("");
-//            tft.print(rfid.serNum[0]);
-//            tft.print(" ");
-//            tft.print(rfid.serNum[1]);
-//            tft.print(" ");
-//            tft.print(rfid.serNum[2]);
-//            tft.print(" ");
-//            tft.print(rfid.serNum[3]);
-//            tft.print(" ");
-//            tft.print(rfid.serNum[4]);
-//            tft.println("");
             
             for(int x = 0; x < sizeof(test); x++){
               for(int i = 0; i < sizeof(rfid.serNum); i++ ){
@@ -177,8 +177,32 @@ void loop(){
 void loginDisplay(){
   tft.fillScreen(ILI9341_BLACK);
   tft.setTextSize(2);
-  tft.setCursor(5,20);
-  tft.println("Login by placing your card on the screen.");
+  tft.setCursor(126,113); // centred text
+  tft.println("bleepr");
+  unsigned long time = millis();
+  if(millis() - time == 0){
+    tft.drawCircle(160,120,60,ILI9341_RED);    
+  } else if(millis() - time == 200){
+    tft.drawCircle(160,120,60,ILI9341_BLACK);
+  }
+//  if(millis() - time == 240){
+//    tft.drawCircle(160,120,80,ILI9341_YELLOW);
+//  }
+//  if(millis() - time == 440){
+//    tft.drawCircle(160,120,80,ILI9341_BLACK);
+//  }
+//  if(millis() - time == 460){
+//    tft.drawCircle(160,120,100,ILI9341_GREEN);
+//  }
+//  if(millis() - time == 660){
+//    tft.drawCircle(160,120,100,ILI9341_GREEN);
+//  }
+//  if(millis() - time == 700){
+//    tft.drawCircle(160,120,100,ILI9341_BLACK);
+//  }
+//  if(millis() - time == 740){
+//    time = millis();
+//  }
 }
 
 void homeDisplay(){
