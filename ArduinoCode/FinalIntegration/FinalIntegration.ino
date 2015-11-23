@@ -115,7 +115,6 @@ void loop(){
             if (read_bt() == "access1") { //Card is good
               display_state = 1;
               screen_drawn = 0;
-              homeDisplay();
             }
             else {
               tft.println("Sorry, no access");
@@ -125,6 +124,13 @@ void loop(){
           }
         }
         break;
+        
+      case 1: //Main Display
+          homeDisplay();
+          
+          //If buttons pressed move to corresponding screen
+        break;
+        
       default:
         break;
     }
@@ -135,7 +141,7 @@ void loop(){
     if(bluetooth.available())  // If the bluetooth sent any characters
     {
       char char_in = (char)bluetooth.read();
-      if(char_in != '~'){ // Before end char
+      if(char_in != '\0'){ // Before end char
         
         bt_buffer = bt_buffer + char_in;
       } else { // Print to screen at end char
@@ -222,14 +228,15 @@ void loginDisplay(){
       tft.setTextSize(2);
       tft.setCursor(126,113); // centred text
       tft.println("bleepr");
+      tft.drawCircle(160,120,60,ILI9341_RED); 
       
       screen_drawn = 1;
       animation_time = millis();
       break;
      case 1: //Animate (Currently janky and NEEDS to be fixed)
-      if(millis() - animation_time >= 20) {
-        tft.drawCircle(160,120,60,ILI9341_RED);  
-      }  
+//      if(millis() - animation_time >= 20) {
+//        tft.drawCircle(160,120,60,ILI9341_RED);  
+//      }  
 //      if(millis() - animation_time >= 200){
 //        tft.drawCircle(160,120,60,ILI9341_BLACK);
 //      }
@@ -254,8 +261,8 @@ void loginDisplay(){
        
        break;
      case 2: //Please wait
-       tft.setCursor(126,100); // centred text
-       tft.print("Please wait");
+       tft.setCursor(126,200); // centred text
+       tft.println("Please wait");
        screen_drawn = 1;
   }
 }
@@ -263,19 +270,34 @@ void loginDisplay(){
 
 //Needs to be converted for new steup
 void homeDisplay(){
-  tft.fillRect(0,0,160,120,ILI9341_LIGHTGREY);
-  tft.fillRect(160,0,160,120,ILI9341_DARKGREY);
-  tft.fillRect(0,120,160,120,ILI9341_DARKGREY);
-  tft.fillRect(160,120,160,120,ILI9341_LIGHTGREY);
-  tft.setTextSize(2);
-  tft.setCursor(5,60);
-  tft.println("Call waiter");
-  tft.setCursor(165,60);
-  tft.println("Ask for bill");
-  tft.setCursor(5,180);
-  tft.println("Food status");
-  tft.setCursor(165,180);
-  tft.println("Leave table");
+  switch(screen_drawn) {
+    case 0: //Setup
+      tft.fillRect(0,0,160,120,ILI9341_LIGHTGREY);
+      tft.fillRect(160,0,160,120,ILI9341_DARKGREY);
+      tft.fillRect(0,120,160,120,ILI9341_DARKGREY);
+      tft.fillRect(160,120,160,120,ILI9341_LIGHTGREY);
+      tft.setTextSize(2);
+      tft.setCursor(5,60);
+      tft.println("Call waiter");
+      tft.setCursor(165,60);
+      tft.println("Ask for bill");
+      tft.setCursor(5,180);
+      tft.println("Food status");
+      tft.setCursor(165,180);
+      tft.println("Leave table");
+      
+      screen_drawn = 1;
+      break;
+      
+     case 1: //Loop
+       break;
+     
+     default:
+       break;
+     
+  }
+  
+  
   
 }
 
